@@ -3,15 +3,14 @@ import { Link } from "react-router-dom";
 
 function Login() {
     return (
-        <main>
+        <>
             {" "}
-            <div>
-                <h1>Welcome To</h1>
-                <h1 className="app-brand">
-                    <span>Chat</span>
+            <section>
+                <h1>
+                    Welcome To <span>Chat</span>
                     <span>App</span>
                 </h1>
-            </div>
+            </section>
             <form action="/login" method="POST">
                 <FormGroup label="Username" type="text" name="username" />
                 <FormGroup label="Password" type="password" name="password" />
@@ -27,7 +26,7 @@ function Login() {
                     </small>
                 </div>
             </form>
-        </main>
+        </>
     );
 }
 
