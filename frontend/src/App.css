@@ -68,3 +68,17 @@ li {
 ul {
     padding: 0;
 }
+
+.success-message:focus,
+.success-message:focus-visible {
+    outline: none;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

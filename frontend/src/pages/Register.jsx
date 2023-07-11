@@ -1,34 +1,21 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Form from "../components/Form.jsx";
 import FormGroup from "../components/FormGroup.jsx";
 
 function Register() {
+    const navigate = useNavigate();
+
     function onSubmitHandler(e) {
+        e.preventDefault();
         fetch("http://localhost:8000/register", {
             method: "POST",
             body: new FormData(e.target),
+            redirect: "follow",
         })
-            .then((response) => {
-                if (!response.ok) {
-                    switch (response.status) {
-                        case 400:
-                            console.log("error 400");
-                            break;
-                        case 401:
-                            console.log("error 401");
-                            break;
-                        case 404:
-                            console.log("error 404");
-                            break;
-                        case 500:
-                            console.log("error 500");
-                            break;
-                    }
-                }
-                return response.json();
-            })
-            .then((data) => console.log(data))
+            .then((response) =>
+                !response.ok ? console.log(error) : navigate("/login", { state: { message: "Registration complete!" } })
+            )
             .catch((error) => console.log(error));
     }
 

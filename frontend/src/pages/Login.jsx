@@ -1,9 +1,26 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Form from "../components/Form.jsx";
 import FormGroup from "../components/FormGroup.jsx";
+import SuccessMessage from "../components/SuccessMessage.jsx";
 
 function Login() {
+    const location = useLocation();
+    const [successMessage, setSuccessMessage] = useState({ isVisible: false, message: "" });
+
+    useEffect(() => {
+        try {
+            if (location.state.message) {
+                setSuccessMessage({ isVisible: true, message: location.state.message });
+                window.history.replaceState({ message: null }, document.title);
+            }
+        } catch (error) {
+            console.log("TypeError Handled");
+        }
+    }, []);
+
+    const handleSuccessMessage = (state) => setSuccessMessage(state);
+
     return (
         <>
             {" "}
@@ -28,6 +45,11 @@ function Login() {
                     </small>
                 </div>
             </Form>
+            <SuccessMessage
+                isVisible={successMessage.isVisible}
+                message={successMessage.message}
+                setState={handleSuccessMessage}
+            />
         </>
     );
 }
