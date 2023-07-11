@@ -8,12 +8,12 @@ class TestData(models.Model):
 
 
 class ContactList(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     contacts = models.ManyToManyField(User, related_name='contacts')
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    contact_list = models.OneToOneField(ContactList)
     image = models.ImageField(default='', upload_to='profile_pics')
 
     def __str__(self):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import TestData
+from .models import TestData, ContactList, Profile
 from django.contrib.auth.models import User
 
 
@@ -27,3 +27,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data['email']
         )
         return user
+
+
+# class ContactListSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = ContactList
+#         fields = ['user', 'contacts']
+
+
+# class ProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Profile
+#         fields = ['user', 'image']

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import TestData
+from .models import TestData, ContactList, Profile
 from rest_framework.response import Response
 from .serializer import TestSerializer, RegisterSerializer
 from django.contrib.auth.models import User
@@ -34,7 +34,10 @@ class UserView(APIView):
 class RegisterUserView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
+
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            ContactList.objects.create(user=user)
+            Profile.objects.create(user=user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
