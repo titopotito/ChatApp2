@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Form from "./Form.jsx";
 
 function Login() {
     return (
@@ -11,7 +12,7 @@ function Login() {
                     <span>App</span>
                 </h1>
             </section>
-            <form action="/login" method="POST">
+            <Form>
                 <FormGroup label="Username" type="text" name="username" />
                 <FormGroup label="Password" type="password" name="password" />
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -22,10 +23,10 @@ function Login() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "flex-start", marginTop: "2rem" }}>
                     <small>
-                        <Link to="/">Need an account?</Link>
+                        <Link to="/register">Need an account?</Link>
                     </small>
                 </div>
-            </form>
+            </Form>
         </>
     );
 }
