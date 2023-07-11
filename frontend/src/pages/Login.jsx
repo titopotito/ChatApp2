@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Form from "./Form.jsx";
+import Form from "../components/Form.jsx";
+import FormGroup from "../components/FormGroup.jsx";
 
 function Login() {
     return (
@@ -28,15 +29,6 @@ function Login() {
                 </div>
             </Form>
         </>
-    );
-}
-
-function FormGroup(props) {
-    return (
-        <div className="form-group">
-            <label>{props.label}</label>
-            <input type={props.type} name={props.name} />
-        </div>
     );
 }
 

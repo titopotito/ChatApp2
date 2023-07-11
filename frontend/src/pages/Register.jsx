@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Form from "./Form.jsx";
+import Form from "../components/Form.jsx";
+import FormGroup from "../components/FormGroup.jsx";
 
 function Register() {
     function onSubmitHandler(e) {
@@ -55,15 +56,6 @@ function Register() {
                 </div>
             </Form>
         </>
-    );
-}
-
-function FormGroup(props) {
-    return (
-        <div className="form-group">
-            <label>{props.label}</label>
-            <input type={props.type} name={props.name} />
-        </div>
     );
 }
 
