@@ -1,22 +1,22 @@
 from rest_framework import serializers
 from .models import TestData, ContactList, Profile
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 
 
 class TestSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = TestData
         fields = ['text', 'number']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-
-    password = serializers.CharField(write_only=True)
-
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'username', 'email', 'password']
+
+    password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -29,14 +29,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# class ContactListSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = ContactList
-#         fields = ['user', 'contacts']
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
 
 
-# class ProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = ['user', 'image']
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']
