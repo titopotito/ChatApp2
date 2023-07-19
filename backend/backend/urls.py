@@ -21,7 +21,6 @@ from chatapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name="home_view"),
     path('user', UserView.as_view(), name='user_view'),
     path('register', RegisterUserView.as_view(), name="register_view"),
     path('login', LoginView.as_view(), name="login_view"),

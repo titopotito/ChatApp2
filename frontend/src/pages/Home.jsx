@@ -1,6 +1,21 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import APIHandler from "../js/apiHandler";
 import ProfileImage from "../components/ProfileImage";
 
 function Home() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        APIHandler.get("/user")
+            .then((data) => {
+                if (!data.user || data.user === "") {
+                    navigate("/login");
+                }
+            })
+            .catch((error) => console.log(error));
+    }, []);
+
     const sectionStyle = { maxWidth: "360px" };
     return (
         <section style={sectionStyle}>
@@ -39,6 +54,32 @@ function ActiveUserList() {
 }
 
 function Navbar() {
+    const handleLogout = (e) => {
+        e.preventDefault();
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + "=") {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        fetch("http://localhost:8000/logout", {
+            method: "POST",
+            redirect: "follow",
+            headers: {
+                Authorization: "Token " + getCookie("token"),
+            },
+        }).then((response) => console.log(response));
+    };
+
     const sectionStyle = {
         display: "flex",
         justifyContent: "space-even",
@@ -53,7 +94,9 @@ function Navbar() {
         <section style={sectionStyle}>
             <button style={buttonStyle}>Messages</button>
             <button style={buttonStyle}>Search</button>
-            <button style={buttonStyle}>Settings</button>
+            <button style={buttonStyle} onClick={handleLogout}>
+                Settings
+            </button>
         </section>
     );
 }

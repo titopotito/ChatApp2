@@ -5,12 +5,6 @@ from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 
 
-class TestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TestData
-        fields = ['text', 'number']
-
-
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

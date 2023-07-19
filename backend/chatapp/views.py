@@ -12,14 +12,6 @@ from .models import ContactList, Profile
 from .serializer import RegisterSerializer, LoginSerializer
 
 
-class HomeView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        token = Token.objects.get(user_id=request.user.id)
-        return Response(token.key)
-
-
 class UserView(APIView):
     def get(self, request):
         token = request.auth

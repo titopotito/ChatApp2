@@ -2,20 +2,17 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Form from "../components/Form.jsx";
 import FormGroup from "../components/FormGroup.jsx";
+import APIHandler from "../js/apiHandler.js";
 
 function Register() {
     const navigate = useNavigate();
 
     function onSubmitHandler(e) {
         e.preventDefault();
-        fetch("http://localhost:8000/register", {
-            method: "POST",
-            body: new FormData(e.target),
-            redirect: "follow",
-        })
-            .then((response) =>
-                !response.ok ? console.log(error) : navigate("/login", { state: { message: "Registration complete!" } })
-            )
+        APIHandler.register(new FormData(e.target))
+            .then((data) => {
+                navigate("/login", { state: { message: "Registration complete!" } });
+            })
             .catch((error) => console.log(error));
     }
 
