@@ -74,6 +74,10 @@ ul {
     outline: none;
 }
 
+.no-outline:focus {
+    outline: none;
+}
+
 @keyframes fadein {
     from {
         opacity: 0;

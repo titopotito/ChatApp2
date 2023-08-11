@@ -1,19 +1,21 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import APIHandler from "../js/apiHandler";
 import ProfileImage from "../components/ProfileImage";
+import Navbar from "../components/Navbar";
 
 function Home() {
+    const [currentUser, setCurrentUser] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
-        APIHandler.get("/user")
-            .then((data) => {
-                if (!data.user || data.user === "") {
-                    navigate("/login");
-                }
-            })
-            .catch((error) => console.log(error));
+        APIHandler.get("/user").then((data) => {
+            if (data) {
+                setCurrentUser(data.user);
+            } else {
+                navigate("/login");
+            }
+        });
     }, []);
 
     const sectionStyle = { maxWidth: "360px" };
@@ -53,55 +55,18 @@ function ActiveUserList() {
     );
 }
 
-function Navbar() {
-    const handleLogout = (e) => {
-        e.preventDefault();
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== "") {
-                const cookies = document.cookie.split(";");
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === name + "=") {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        fetch("http://localhost:8000/logout", {
-            method: "POST",
-            redirect: "follow",
-            headers: {
-                Authorization: "Token " + getCookie("token"),
-            },
-        }).then((response) => console.log(response));
-    };
-
-    const sectionStyle = {
-        display: "flex",
-        justifyContent: "space-even",
-    };
-    const buttonStyle = {
-        flexGrow: "1",
-        borderRadius: "0",
-        padding: "1rem",
-    };
-
-    return (
-        <section style={sectionStyle}>
-            <button style={buttonStyle}>Messages</button>
-            <button style={buttonStyle}>Search</button>
-            <button style={buttonStyle} onClick={handleLogout}>
-                Settings
-            </button>
-        </section>
-    );
-}
-
 function ChatList() {
+    const [chatrooms, setChatrooms] = useState([]);
+
+    useEffect(() => {
+        APIHandler.get("/chatrooms")
+            .then((data) => {
+                setChatrooms(data);
+                console.log(data);
+            })
+            .catch((error) => console.log(error));
+    }, []);
+
     const aStyle = { display: "flex", gap: "1rem", padding: "0.7rem 1rem" };
 
     const div2Style = {
@@ -115,42 +80,26 @@ function ChatList() {
     return (
         <section>
             <ul>
-                <li>
-                    <a href="" style={aStyle}>
-                        <ProfileImage />
-                        <div style={div2Style}>
-                            <strong>James Tito</strong>
-                            <div style={div3Style}>
-                                <span>This is a message</span>
-                                <span>11:00</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <a href="" style={aStyle}>
-                        <ProfileImage />
-                        <div style={div2Style}>
-                            <strong>James Tito</strong>
-                            <div style={div3Style}>
-                                <span>This is a message</span>
-                                <span>11:00</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <a href="" style={aStyle}>
-                        <ProfileImage />
-                        <div style={div2Style}>
-                            <strong>James Tito</strong>
-                            <div style={div3Style}>
-                                <span>This is a message</span>
-                                <span>11:00</span>
-                            </div>
-                        </div>
-                    </a>
-                </li>
+                {chatrooms.map((chatroom) =>
+                    chatroom.latest_message ? (
+                        <li key={chatroom.id}>
+                            <Link to={`/chat/${chatroom.id}`} style={aStyle}>
+                                <ProfileImage />
+                                <div style={div2Style}>
+                                    <strong>
+                                        {chatroom.members[0].first_name + " " + chatroom.members[0].last_name}
+                                    </strong>
+                                    <div style={div3Style}>
+                                        <span>{chatroom.latest_message.text_content}</span>
+                                        <span>11:00</span>
+                                    </div>
+                                </div>
+                            </Link>
+                        </li>
+                    ) : (
+                        ""
+                    )
+                )}
             </ul>
         </section>
     );

@@ -26,12 +26,33 @@ const APIHandler = {
     },
 
     get: async function (route) {
-        return await fetch("http://localhost:8000" + route, {
+        return await fetch(SERVER_URL + route, {
             method: "GET",
             headers: {
                 Authorization: "Token " + CookieHandler.get("token"),
             },
-        }).then((response) => response.json());
+        })
+            .then((response) => {
+                if (response.ok) return response.json();
+                else return null;
+            })
+            .catch((error) => console.log("Caught Error: ", error));
+    },
+
+    post: async function (route, body) {
+        return fetch(SERVER_URL + route, {
+            method: "POST",
+            body: body,
+            headers: {
+                Authorization: "Token " + CookieHandler.get("token"),
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => {
+                if (response.ok) return response.json();
+                else return null;
+            })
+            .catch((error) => console.log("Caught Error: ", error));
     },
 };
 

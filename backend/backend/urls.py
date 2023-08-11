@@ -24,5 +24,11 @@ urlpatterns = [
     path('user', UserView.as_view(), name='user_view'),
     path('register', RegisterUserView.as_view(), name="register_view"),
     path('login', LoginView.as_view(), name="login_view"),
-    path('logout', LogoutView.as_view(), name="logout_view")
+    path('logout', LogoutView.as_view(), name="logout_view"),
+    path('chatrooms', ChatRoomListView.as_view(), name="chatroom_list_view"),
+    path('chatrooms/<int:id>', ChatRoomDetailView.as_view(), name="chatroom_detail_view"),
+    path('chatrooms/new', ChatRoomCreateView.as_view(), name="chatroom_create_view"),
+    path('messages', MessageListView.as_view(), name='message_list_view'),
+    path('messages/new', MessageCreateView.as_view(), name="message_create_view"),
+    path('messages/delete/<int:id>', MessageDeleteView.as_view(), name="message_delete_view"),
 ]

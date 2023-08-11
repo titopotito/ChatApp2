@@ -1,6 +1,6 @@
-function ProfileImage() {
-    const spanStyle = { position: "relative" };
-    const imgStyle = { width: "3rem", borderRadius: "1.5rem" };
+function ProfileImage(props) {
+    const spanStyle = { position: "relative", display: "flex", alignItems: "center" };
+    const imgStyle = { width: props.width, borderRadius: "1.5rem" };
     const statusStyle = {
         width: "11px",
         height: "11px",
@@ -8,7 +8,7 @@ function ProfileImage() {
         borderRadius: "9.5px",
         border: "4px solid #242424",
         position: "absolute",
-        bottom: "0",
+        bottom: "-0.2rem",
         right: "-0.2rem",
     };
 
@@ -19,5 +19,9 @@ function ProfileImage() {
         </span>
     );
 }
+
+ProfileImage.defaultProps = {
+    width: "3rem",
+};
 
 export default ProfileImage;

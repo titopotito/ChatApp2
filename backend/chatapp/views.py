@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
@@ -8,15 +11,75 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
-from .models import ContactList, Profile
-from .serializer import RegisterSerializer, LoginSerializer
+from .models import Profile, ChatRoom, Message
+from .serializer import RegisterSerializer, LoginSerializer, ChatRoomSerializer, ChatRoomListSerializer, MessageSerializer
 
 
 class UserView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         token = request.auth
         user = Token.objects.get(key=token).user
-        return Response({'user': user.username})
+        return Response({'user': {'username': user.username, 'id': user.id}})
+
+
+class ChatRoomListView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        chatrooms = ChatRoom.objects.filter(members=request.user)
+        serializer = ChatRoomListSerializer(chatrooms, many=True)
+        return Response(serializer.data)
+
+
+class ChatRoomDetailView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        return Response(None)
+
+
+class ChatRoomCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        data = json.loads(request.body)
+        member_usernames = data.get('members')
+        serializer = ChatRoomSerializer(data={'member_usernames': member_usernames})
+        if serializer.is_valid():
+            chatroom = serializer.save()
+            return Response({"chatroom_id": chatroom.id}, status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessageListView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request):
+        return Response(None)
+
+
+class MessageCreateView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        data = json.loads(request.body)
+        serializer = MessageSerializer(data=data)
+        if serializer.is_valid():
+            message = serializer.save()
+            return Response({"message_id": message.id, "message": 'Successfully sent message'}, status.HTTP_201_CREATED)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MessageDeleteView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        return Response(None)
 
 
 class RegisterUserView(APIView):
@@ -24,9 +87,9 @@ class RegisterUserView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            ContactList.objects.create(user=user)
             Profile.objects.create(user=user)
             return Response(status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -51,5 +114,12 @@ class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        try:
+            request.user.auth_token.delete()
+        except (AttributeError):
+            pass
+
         logout(request)
-        return redirect('/')
+
+        return Response({"success": ("Successfully logged out.")},
+                        status=status.HTTP_200_OK)

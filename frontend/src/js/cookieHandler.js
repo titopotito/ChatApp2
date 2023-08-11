@@ -25,6 +25,10 @@ const CookieHandler = {
             ";path=/" +
             (EXPIRE_DAYS == null ? "" : ";expires=" + exdate.toGMTString());
     },
+
+    delete: function (cookieName) {
+        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    },
 };
 
 export default CookieHandler;
