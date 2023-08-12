@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import APIHandler from "../js/apiHandler";
 import ProfileImage from "../components/ProfileImage";
 
-function Chat(props) {
+function Chat() {
     const [currentUser, setCurrentUser] = useState({});
+    const [messages, setMessages] = useState([]);
+    const [userInput, setUserInput] = useState("");
 
     const navigate = useNavigate();
 
@@ -15,22 +17,85 @@ function Chat(props) {
         });
     }, []);
 
+    useEffect(() => {
+        const id = window.location.pathname.slice(6);
+        APIHandler.get(`/messages/${id}`).then((messages) => {
+            if (messages) setMessages(messages);
+            else console.log("No data received from /messages/:id");
+        });
+    }, []);
+
+    const inputHandler = (userInput) => {
+        setUserInput(userInput);
+    };
+
+    const messagesHandler = (message) => {
+        setMessages([...messages, message]);
+    };
+
     const divStyle = {
         display: "flex",
         flexDirection: "column",
         height: "100vh",
     };
+
     return (
         <div style={divStyle}>
             <ChatHeader currentUser={currentUser} />
-            <ChatBody />
-            <ChatForm />
+            <ChatBody messages={messages} />
+            <ChatForm
+                currentUser={currentUser}
+                userInput={userInput}
+                inputHandler={inputHandler}
+                messagesHandler={messagesHandler}
+            />
         </div>
     );
 }
 
-function MessageBody(props) {
-    const { message } = props;
+function ChatHeader(props) {
+    const { currentUser } = props;
+
+    const headerStyle = {
+        display: "flex",
+        alignItems: "center",
+        backgroundColor: "#1a1a1a",
+        padding: "0.5rem",
+    };
+    const divStyle = {
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        flex: "1",
+        padding: "0 1rem",
+    };
+    const buttonStyle = {
+        width: "40px",
+        height: "40px",
+        borderRadius: "20px",
+        padding: "0",
+    };
+
+    return (
+        <header style={headerStyle}>
+            <button style={buttonStyle}>Ba</button>
+            <div style={divStyle}>
+                <ProfileImage width="2.25rem" />
+                <span>{`${currentUser.first_name} ${currentUser.last_name}`}</span>
+            </div>
+            <button style={buttonStyle}>Ca</button>
+            <button style={buttonStyle}>Vi</button>
+            <button style={buttonStyle}>Pr</button>
+        </header>
+    );
+}
+
+function ChatBody(props) {
+    const { messages } = props;
+
+    const ulStyle = {
+        flex: "1",
+    };
 
     const liStyle = {
         display: "flex",
@@ -45,40 +110,20 @@ function MessageBody(props) {
     };
 
     return (
-        <li style={liStyle}>
-            <ProfileImage width="2.25rem" />
-            <p style={pStyle}>{message.text_content}</p>
-        </li>
-    );
-}
-
-function ChatBody() {
-    const [messages, setMessages] = useState([]);
-    const location = useLocation();
-    const id = location.pathname.slice(6);
-
-    useEffect(() => {
-        APIHandler.get(`/messages/${id}`).then((data) => {
-            console.log(data);
-            if (data) setMessages(data);
-            else console.log("no messages");
-        });
-    }, []);
-
-    const ulStyle = {
-        flex: "1",
-    };
-
-    return (
         <ul style={ulStyle}>
             {messages.map((message) => (
-                <MessageBody message={message} key={message.id} />
+                <li style={liStyle} key={message.id}>
+                    <ProfileImage width="2.25rem" />
+                    <p style={pStyle}>{message.text_content}</p>
+                </li>
             ))}
         </ul>
     );
 }
 
-function ChatForm() {
+function ChatForm(props) {
+    const { currentUser, userInput, inputHandler, messagesHandler } = props;
+
     const sectionStyle = {
         display: "flex",
         alignItems: "center",
@@ -116,53 +161,31 @@ function ChatForm() {
         fontSize: "small",
     };
 
+    const onChange = (e) => inputHandler(e.target.value);
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        const chatroomId = window.location.pathname.slice(6);
+        const message = {
+            text_content: userInput,
+            sender: currentUser.id,
+            chatroom: chatroomId,
+        };
+        APIHandler.post("/messages/new", JSON.stringify(message)).then((message) => {
+            if (message) messagesHandler(message);
+            else console.log("No data received from /messages/new");
+        });
+    };
+
     return (
         <section style={sectionStyle}>
             <button style={buttonStyle}>+</button>
             <button style={buttonStyle}>Im</button>
-            <form action="" style={formStyle}>
-                <input type="text" style={inputStyle} className="no-outline" />
+            <form action="" style={formStyle} onSubmit={onSubmit}>
+                <input type="text" style={inputStyle} className="no-outline" onChange={onChange} />
                 <button style={button2Style}>Send</button>
             </form>
         </section>
-    );
-}
-
-function ChatHeader(props) {
-    const { currentUser } = props;
-    const headerStyle = {
-        display: "flex",
-        alignItems: "center",
-        backgroundColor: "#1a1a1a",
-        padding: "0.5rem",
-    };
-    const divStyle = {
-        display: "flex",
-        alignItems: "center",
-        gap: "0.5rem",
-        flex: "1",
-        padding: "0 1rem",
-    };
-    const buttonStyle = {
-        width: "40px",
-        height: "40px",
-        borderRadius: "20px",
-        padding: "0",
-    };
-
-    return (
-        <header style={headerStyle}>
-            <button style={buttonStyle}>Ba</button>
-
-            <div style={divStyle}>
-                <ProfileImage width="2.25rem" />
-                <span>{`${currentUser.first_name} ${currentUser.last_name}`}</span>
-            </div>
-
-            <button style={buttonStyle}>Ca</button>
-            <button style={buttonStyle}>Vi</button>
-            <button style={buttonStyle}>Pr</button>
-        </header>
     );
 }
 

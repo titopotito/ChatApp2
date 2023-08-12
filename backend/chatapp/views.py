@@ -72,10 +72,11 @@ class MessageCreateView(APIView):
         data = json.loads(request.body)
         serializer = MessageSerializer(data=data)
         if serializer.is_valid():
-            message = serializer.save()
-            return Response({"message_id": message.id, "message": 'Successfully sent message'}, status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
 
         else:
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
