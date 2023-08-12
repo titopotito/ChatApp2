@@ -9,9 +9,9 @@ function Home() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        APIHandler.get("/user").then((data) => {
-            if (data) {
-                setCurrentUser(data.user);
+        APIHandler.get("/user").then((user) => {
+            if (user) {
+                setCurrentUser(user);
             } else {
                 navigate("/login");
             }

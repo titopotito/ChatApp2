@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
 from .models import Profile, ChatRoom, Message
-from .serializer import RegisterSerializer, LoginSerializer, ChatRoomSerializer, ChatRoomListSerializer, MessageSerializer
+from .serializer import RegisterSerializer, LoginSerializer, ChatRoomSerializer, ChatRoomListSerializer, MessageSerializer, UserSerializer
 
 
 class UserView(APIView):
@@ -21,7 +21,8 @@ class UserView(APIView):
     def get(self, request):
         token = request.auth
         user = Token.objects.get(key=token).user
-        return Response({'user': {'username': user.username, 'id': user.id}})
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 
 class ChatRoomListView(APIView):
@@ -30,6 +31,7 @@ class ChatRoomListView(APIView):
     def get(self, request):
         chatrooms = ChatRoom.objects.filter(members=request.user)
         serializer = ChatRoomListSerializer(chatrooms, many=True)
+
         return Response(serializer.data)
 
 
@@ -57,8 +59,10 @@ class ChatRoomCreateView(APIView):
 class MessageListView(APIView):
     permission_classes = (IsAuthenticated, )
 
-    def get(self, request):
-        return Response(None)
+    def get(self, request, chatroom_id):
+        messages = Message.objects.filter(chatroom=chatroom_id)
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MessageCreateView(APIView):

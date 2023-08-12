@@ -14,7 +14,11 @@ function ProfileImage(props) {
 
     return (
         <span style={spanStyle}>
-            <img src="images/default_user_image.jpg" alt="Profile image of user" style={imgStyle} />
+            <img
+                src={`${window.location.origin}/images/default_user_image.jpg`}
+                alt="Profile image of user"
+                style={imgStyle}
+            />
             <div style={statusStyle}></div>
         </span>
     );

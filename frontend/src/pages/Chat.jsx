@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import APIHandler from "../js/apiHandler";
 import ProfileImage from "../components/ProfileImage";
 
-function Chat() {
+function Chat(props) {
     const [currentUser, setCurrentUser] = useState({});
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        APIHandler.get("/user").then((data) => {
-            if (data) {
-                setCurrentUser(data.user);
-            } else {
-                navigate("/login");
-            }
+        APIHandler.get("/user").then((user) => {
+            if (user) setCurrentUser(user);
+            else navigate("/login");
         });
     }, []);
 
@@ -24,19 +22,60 @@ function Chat() {
     };
     return (
         <div style={divStyle}>
-            <ChatHeader />
+            <ChatHeader currentUser={currentUser} />
             <ChatBody />
             <ChatForm />
         </div>
     );
 }
 
+function MessageBody(props) {
+    const { message } = props;
+
+    const liStyle = {
+        display: "flex",
+        gap: "1rem",
+    };
+
+    const pStyle = {
+        flex: "1",
+        margin: "0",
+        textAlign: "start",
+        backgroundColor: "black",
+    };
+
+    return (
+        <li style={liStyle}>
+            <ProfileImage width="2.25rem" />
+            <p style={pStyle}>{message.text_content}</p>
+        </li>
+    );
+}
+
 function ChatBody() {
-    const sectionStyle = {
+    const [messages, setMessages] = useState([]);
+    const location = useLocation();
+    const id = location.pathname.slice(6);
+
+    useEffect(() => {
+        APIHandler.get(`/messages/${id}`).then((data) => {
+            console.log(data);
+            if (data) setMessages(data);
+            else console.log("no messages");
+        });
+    }, []);
+
+    const ulStyle = {
         flex: "1",
     };
 
-    return <section style={sectionStyle}></section>;
+    return (
+        <ul style={ulStyle}>
+            {messages.map((message) => (
+                <MessageBody message={message} key={message.id} />
+            ))}
+        </ul>
+    );
 }
 
 function ChatForm() {
@@ -89,7 +128,8 @@ function ChatForm() {
     );
 }
 
-function ChatHeader() {
+function ChatHeader(props) {
+    const { currentUser } = props;
     const headerStyle = {
         display: "flex",
         alignItems: "center",
@@ -116,7 +156,7 @@ function ChatHeader() {
 
             <div style={divStyle}>
                 <ProfileImage width="2.25rem" />
-                <span>James Tito</span>
+                <span>{`${currentUser.first_name} ${currentUser.last_name}`}</span>
             </div>
 
             <button style={buttonStyle}>Ca</button>

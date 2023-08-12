@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ["sender", "chatroom", "text_content"]
+        fields = ["id", "sender", "chatroom", "text_content"]
 
     def create(self, validated_data):
         message = Message.objects.create(
@@ -75,7 +75,6 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
         try:
             message = obj.message_set.all().latest('created_at')
             serializer = MessageSerializer(message)
-            print(serializer.data)
             return serializer.data
         except:
             return None
